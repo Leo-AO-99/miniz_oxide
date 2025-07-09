@@ -526,10 +526,10 @@ impl CallbackOut<'_> {
 }
 
 pub struct CallbackOxide<'a> {
-    in_buf: Option<&'a [u8]>,
-    in_buf_size: Option<&'a mut usize>,
-    out_buf_size: Option<&'a mut usize>,
-    out: CallbackOut<'a>,
+    pub in_buf: Option<&'a [u8]>,
+    pub in_buf_size: Option<&'a mut usize>,
+    pub out_buf_size: Option<&'a mut usize>,
+    pub out: CallbackOut<'a>,
 }
 
 impl<'a> CallbackOxide<'a> {
@@ -1425,7 +1425,7 @@ pub struct LZOxide {
 }
 
 impl LZOxide {
-    const fn new() -> Self {
+    pub const fn new() -> Self {
         LZOxide {
             codes: [0; LZ_CODE_BUF_SIZE],
             code_position: 1,
