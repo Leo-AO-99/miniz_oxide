@@ -551,6 +551,15 @@ impl<'a> CallbackOxide<'a> {
         }
     }
 
+    pub fn new_callback_func_without_in(callback_func: CallbackFunc<'a>) -> Self {
+        CallbackOxide {
+            in_buf: None,
+            in_buf_size: None,
+            out_buf_size: None,
+            out: CallbackOut::Func(callback_func),
+        }
+    }
+
     fn update_size(&mut self, in_size: Option<usize>, out_size: Option<usize>) {
         if let (Some(in_size), Some(size)) = (in_size, self.in_buf_size.as_mut()) {
             **size = in_size;
