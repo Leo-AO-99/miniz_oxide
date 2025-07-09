@@ -19,7 +19,7 @@ use crate::DataFormat;
 // Currently not bubbled up outside this module, so can fill in with more
 // context eventually if needed.
 type Result<T, E = Error> = core::result::Result<T, E>;
-pub(crate) struct Error {}
+pub struct Error {}
 
 pub(crate) const MAX_PROBES_MASK: u32 = 0xFFF;
 
@@ -323,12 +323,12 @@ const fn read_u16_le<const N: usize>(slice: &[u8; N], pos: usize) -> u16 {
 
 /// Main compression struct.
 pub struct CompressorOxide {
-    pub(crate) lz: LZOxide,
-    pub(crate) params: ParamsOxide,
+    pub lz: LZOxide,
+    pub params: ParamsOxide,
     /// Put HuffmanOxide on the heap with default trick to avoid
     /// excessive stack copies.
-    pub(crate) huff: Box<HuffmanOxide>,
-    pub(crate) dict: DictOxide,
+    pub huff: Box<HuffmanOxide>,
+    pub dict: DictOxide,
 }
 
 impl CompressorOxide {
@@ -463,7 +463,7 @@ impl CallbackFunc<'_> {
     }
 }
 
-struct CallbackBuf<'a> {
+pub struct CallbackBuf<'a> {
     pub out_buf: &'a mut [u8],
 }
 
@@ -491,7 +491,7 @@ impl CallbackBuf<'_> {
     }
 }
 
-enum CallbackOut<'a> {
+pub enum CallbackOut<'a> {
     Func(CallbackFunc<'a>),
     Buf(CallbackBuf<'a>),
 }
@@ -525,7 +525,7 @@ impl CallbackOut<'_> {
     }
 }
 
-pub(crate) struct CallbackOxide<'a> {
+pub struct CallbackOxide<'a> {
     in_buf: Option<&'a [u8]>,
     in_buf_size: Option<&'a mut usize>,
     out_buf_size: Option<&'a mut usize>,
@@ -693,7 +693,7 @@ impl BitBuffer {
 /// NOTE: Only the literal/lengths have enough symbols to actually use
 /// the full array. It's unclear why it's defined like this in miniz,
 /// it could be for cache/alignment reasons.
-pub(crate) struct HuffmanOxide {
+pub struct HuffmanOxide {
     /// Number of occurrences of each symbol.
     pub count: [[u16; MAX_HUFF_SYMBOLS]; MAX_HUFF_TABLES],
     /// The bits of the huffman code assigned to the symbol
@@ -1126,7 +1126,7 @@ impl HuffmanOxide {
     }
 }
 
-pub(crate) struct DictOxide {
+pub struct DictOxide {
     /// The maximum number of checks in the hash chain, for the initial,
     /// and the lazy match respectively.
     pub max_probes: [u32; 2],
@@ -1339,7 +1339,7 @@ impl DictOxide {
     }
 }
 
-pub(crate) struct ParamsOxide {
+pub struct ParamsOxide {
     pub flags: u32,
     pub greedy_parsing: bool,
     pub block_index: u32,
@@ -1414,7 +1414,7 @@ impl ParamsOxide {
     }
 }
 
-pub(crate) struct LZOxide {
+pub struct LZOxide {
     pub codes: [u8; LZ_CODE_BUF_SIZE],
     pub code_position: usize,
     pub flag_position: usize,
@@ -1592,7 +1592,7 @@ fn compress_block(
     compress_lz_codes(huff, output, &lz.codes, lz.code_position)
 }
 
-pub(crate) fn flush_block(
+pub fn flush_block(
     d: &mut CompressorOxide,
     callback: &mut CallbackOxide,
     flush: TDEFLFlush,
@@ -1722,7 +1722,7 @@ pub(crate) fn flush_block(
     Ok(callback.flush_output(saved_buffer, &mut d.params))
 }
 
-pub(crate) fn record_literal(h: &mut HuffmanOxide, lz: &mut LZOxide, lit: u8) {
+pub fn record_literal(h: &mut HuffmanOxide, lz: &mut LZOxide, lit: u8) {
     lz.total_bytes += 1;
     lz.write_code(lit);
 
@@ -1732,7 +1732,7 @@ pub(crate) fn record_literal(h: &mut HuffmanOxide, lz: &mut LZOxide, lit: u8) {
     h.count[0][lit as usize] += 1;
 }
 
-fn record_match(h: &mut HuffmanOxide, lz: &mut LZOxide, match_len: u32, mut match_dist: u32) {
+pub fn record_match(h: &mut HuffmanOxide, lz: &mut LZOxide, match_len: u32, mut match_dist: u32) {
     debug_assert!(match_len >= MIN_MATCH_LEN.into());
     debug_assert!(match_dist >= 1);
     debug_assert!(match_dist as usize <= LZ_DICT_SIZE);
