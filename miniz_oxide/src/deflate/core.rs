@@ -570,7 +570,7 @@ impl<'a> CallbackOxide<'a> {
         }
     }
 
-    fn flush_output(
+    pub fn flush_output(
         &mut self,
         saved_output: SavedOutputBufferOxide,
         params: &mut ParamsOxide,
