@@ -497,7 +497,7 @@ pub enum CallbackOut<'a> {
 }
 
 impl CallbackOut<'_> {
-    fn new_output_buffer<'b>(
+    pub fn new_output_buffer<'b>(
         &'b mut self,
         local_buf: &'b mut [u8],
         out_buf_ofs: usize,
@@ -591,7 +591,7 @@ impl<'a> CallbackOxide<'a> {
     }
 }
 
-struct OutputBufferOxide<'a> {
+pub struct OutputBufferOxide<'a> {
     pub inner: &'a mut [u8],
     pub inner_pos: usize,
     pub local: bool,
@@ -604,7 +604,7 @@ impl OutputBufferOxide<'_> {
     /// Write bits to the bit buffer and flushes
     /// the bit buffer so any whole bytes are output
     /// to the underlying buffer.
-    fn put_bits(&mut self, bits: u32, len: u32) {
+    pub fn put_bits(&mut self, bits: u32, len: u32) {
         // TODO: Removing this assertion worsens performance
         // Need to figure out why
         assert!(bits <= ((1u32 << len) - 1u32));
@@ -627,7 +627,7 @@ impl OutputBufferOxide<'_> {
         self.bits_in += len;
     }
 
-    const fn save(&self) -> SavedOutputBufferOxide {
+    pub const fn save(&self) -> SavedOutputBufferOxide {
         SavedOutputBufferOxide {
             pos: self.inner_pos,
             bit_buffer: self.bit_buffer,
@@ -636,7 +636,7 @@ impl OutputBufferOxide<'_> {
         }
     }
 
-    fn load(&mut self, saved: SavedOutputBufferOxide) {
+    pub fn load(&mut self, saved: SavedOutputBufferOxide) {
         self.inner_pos = saved.pos;
         self.bit_buffer = saved.bit_buffer;
         self.bits_in = saved.bits_in;
@@ -646,7 +646,7 @@ impl OutputBufferOxide<'_> {
     #[inline]
     /// Pad the bit buffer to a whole byte with
     /// zeroes and write that byte to the output buffer.
-    fn pad_to_bytes(&mut self) {
+    pub fn pad_to_bytes(&mut self) {
         if self.bits_in != 0 {
             let len = 8 - self.bits_in;
             self.put_bits(0, len);
@@ -654,14 +654,14 @@ impl OutputBufferOxide<'_> {
     }
 
     #[inline]
-    fn write_bytes(&mut self, bytes: &[u8]) {
+    pub fn write_bytes(&mut self, bytes: &[u8]) {
         debug_assert_eq!(self.bits_in, 0);
         self.inner[self.inner_pos..self.inner_pos + bytes.len()].copy_from_slice(bytes);
         self.inner_pos += bytes.len();
     }
 }
 
-struct SavedOutputBufferOxide {
+pub struct SavedOutputBufferOxide {
     pub pos: usize,
     pub bit_buffer: u32,
     pub bits_in: u32,
@@ -1451,7 +1451,7 @@ impl LZOxide {
         self.code_position += 1;
     }
 
-    fn init_flag(&mut self) {
+    pub fn init_flag(&mut self) {
         if self.num_flags_left == 8 {
             *self.get_flag() = 0;
             self.code_position -= 1;
